@@ -1,0 +1,42 @@
+[project]
+name = "ai-prep-buddy-backend"
+version = "0.1.0"
+description = "AI Prep Buddy backend — an AI interview-prep coach (RAG, quiz, interview bot, planner)."
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pre-commit>=4.0",
+]
+
+# No [build-system]: this is a virtual (application) project. uv manages the
+# environment and dependencies but does not build/install `app` as a package;
+# tools run from this directory with `app/` on the path.
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+# F=pyflakes, E=pycodestyle, I=isort, UP=pyupgrade, B=bugbear, SIM=simplify,
+# C4=comprehensions, ASYNC=async pitfalls, RUF=ruff-specific.
+select = ["E", "F", "I", "UP", "B", "SIM", "C4", "ASYNC", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["app"]
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
