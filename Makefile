@@ -6,7 +6,7 @@ UVDIR  := uv run --directory backend
 UVPROJ := uv run --project backend
 
 .PHONY: setup fmt lint type test check \
-        up migrate dev worker test-int ingest eval-fast eval-full
+        up down ps migrate dev worker test-int ingest eval-fast eval-full
 
 # ---------- Working now (M0-T1) ----------
 setup:            ## Install deps and git hooks
@@ -28,10 +28,17 @@ test:             ## Unit tests
 
 check: lint type test   ## Lint + type-check + unit tests
 
-# ---------- Stubs (land in later tickets) ----------
-up:
-	@echo "make up: docker compose (postgres, redis, qdrant) lands in M0-T3"
+# ---------- Local infrastructure (M0-T3) ----------
+up:               ## Start Postgres, Redis, Qdrant and wait until healthy
+	docker compose up -d --wait
 
+down:             ## Stop infra (keep data); use `docker compose down -v` to wipe
+	docker compose down
+
+ps:               ## Show infra container status
+	docker compose ps
+
+# ---------- Stubs (land in later tickets) ----------
 migrate:
 	@echo "make migrate: alembic migrations land in M0-T4"
 

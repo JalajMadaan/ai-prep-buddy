@@ -1,0 +1,13 @@
+# Normalise line endings: store LF in the repo, check out LF everywhere.
+# CI runs on Linux and we have shell/Makefile files, so LF is the safe default.
+* text=auto eol=lf
+
+# Binary assets: never normalise.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
