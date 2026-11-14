@@ -7,6 +7,7 @@ name: ai-prep-buddy
 services:
   postgres:
     image: postgres:16
+    restart: unless-stopped
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
@@ -26,6 +27,7 @@ services:
 
   redis:
     image: redis:7
+    restart: unless-stopped
     # AOF off locally: Redis holds only ephemeral state (cache, queue, rate limits).
     command: ["redis-server", "--appendonly", "no"]
     ports:
@@ -38,6 +40,7 @@ services:
 
   qdrant:
     image: qdrant/qdrant:v1.12.4
+    restart: unless-stopped
     ports:
       - "6333:6333" # HTTP / REST
       - "6334:6334" # gRPC

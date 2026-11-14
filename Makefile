@@ -6,7 +6,7 @@ UVDIR  := uv run --directory backend
 UVPROJ := uv run --project backend
 
 .PHONY: setup fmt lint type test check \
-        up down ps migrate dev worker test-int ingest eval-fast eval-full
+        up down ps migrate revision dev worker test-int ingest eval-fast eval-full
 
 # ---------- Working now (M0-T1) ----------
 setup:            ## Install deps and git hooks
@@ -23,8 +23,8 @@ lint:             ## Lint (and check formatting)
 type:             ## Type-check (mypy --strict on app/)
 	$(UVDIR) mypy
 
-test:             ## Unit tests
-	$(UVDIR) pytest
+test:             ## Unit tests (no live infra needed)
+	$(UVDIR) pytest -m "not integration"
 
 check: lint type test   ## Lint + type-check + unit tests
 
@@ -39,17 +39,20 @@ ps:               ## Show infra container status
 	docker compose ps
 
 # ---------- Stubs (land in later tickets) ----------
-migrate:
-	@echo "make migrate: alembic migrations land in M0-T4"
+migrate:          ## Apply database migrations (alembic upgrade head)
+	$(UVDIR) alembic upgrade head
+
+revision:         ## Autogenerate a migration: make revision m="add x table"
+	$(UVDIR) alembic revision --autogenerate -m "$(m)"
+
+test-int:         ## Integration tests (requires `make up`)
+	$(UVDIR) pytest -m integration
 
 dev:
 	@echo "make dev: uvicorn app lands in M0-T5"
 
 worker:
 	@echo "make worker: arq worker lands in a later milestone"
-
-test-int:
-	@echo "make test-int: integration tests land in M0-T4 and later"
 
 ingest:
 	@echo "make ingest: knowledge-base ingestion lands in M1"

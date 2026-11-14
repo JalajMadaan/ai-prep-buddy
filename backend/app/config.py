@@ -45,6 +45,8 @@ class Settings(BaseSettings):
 
     # ---------- Data ----------
     database_url: str = "postgresql+asyncpg://app:app@localhost:5432/app"
+    db_pool_size: int = 5
+    db_max_overflow: int = 10
     redis_url: str = "redis://localhost:6379/0"
     qdrant_url: str = "http://localhost:6333"
     qdrant_api_key: str = ""

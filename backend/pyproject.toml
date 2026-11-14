@@ -4,9 +4,13 @@ version = "0.1.0"
 description = "AI Prep Buddy backend — an AI interview-prep coach (RAG, quiz, interview bot, planner)."
 requires-python = ">=3.12"
 dependencies = [
+    "alembic>=1.20.1",
+    "asyncpg>=0.32.0",
     "fastapi>=0.162.7",
     "pydantic-settings>=2.16.3",
+    "sqlalchemy[asyncio]>=2.1.8",
     "structlog>=26.1.0",
+    "uuid6>=2025.0.1",
 ]
 
 [dependency-groups]
@@ -36,11 +40,19 @@ select = ["E", "F", "I", "UP", "B", "SIM", "C4", "ASYNC", "RUF"]
 [tool.ruff.lint.isort]
 known-first-party = ["app", "tests"]
 
+[tool.ruff.lint.per-file-ignores]
+# Generated migrations: allow long lines and alembic's import ordering.
+"alembic/versions/*.py" = ["E501", "I001"]
+
 [tool.mypy]
 python_version = "3.12"
 strict = true
 files = ["app"]
 warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["uuid6"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -48,3 +60,6 @@ asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-q"
+markers = [
+    "integration: requires live infra (postgres/redis/qdrant); run via `make test-int`",
+]
