@@ -3,7 +3,11 @@ name = "ai-prep-buddy-backend"
 version = "0.1.0"
 description = "AI Prep Buddy backend — an AI interview-prep coach (RAG, quiz, interview bot, planner)."
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi>=0.162.7",
+    "pydantic-settings>=2.16.3",
+    "structlog>=26.1.0",
+]
 
 [dependency-groups]
 dev = [
@@ -12,6 +16,7 @@ dev = [
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
     "pre-commit>=4.0",
+    "httpx>=0.28.1",
 ]
 
 # No [build-system]: this is a virtual (application) project. uv manages the
@@ -27,6 +32,9 @@ src = ["app", "tests"]
 # F=pyflakes, E=pycodestyle, I=isort, UP=pyupgrade, B=bugbear, SIM=simplify,
 # C4=comprehensions, ASYNC=async pitfalls, RUF=ruff-specific.
 select = ["E", "F", "I", "UP", "B", "SIM", "C4", "ASYNC", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "tests"]
 
 [tool.mypy]
 python_version = "3.12"
