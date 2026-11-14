@@ -92,3 +92,10 @@ One entry per ticket. Keep each entry short enough to reread before an interview
 - **Tradeoff:** a little writing per decision — repaid the first time someone (including future me, or an interviewer) asks "why did you build it this way?".
 - **Interview question:** Why a modular monolith instead of microservices for this project?
 - **My answer:** At launch scale (≈20 daily users) and as a solo builder on free tiers, microservices would buy independent scaling I don't need while costing network hops, distributed tracing, and deploy coordination I can't justify. A modular monolith with strict layering (`api → services → lower layers`) plus separate background and voice workers gives me one process to debug and one trace per request, while the clean module seams and adapter interfaces mean I can split a hot path (say the voice worker, which is CPU-bound) into its own service later as a move, not a rewrite. I'd split only on a real signal — a scaling bottleneck, a team boundary, or an independent release need — not speculatively.
+
+### M1-T1 · Knowledge-base content · 2026-11-14
+- **Concept:** The KB is RAG's ground truth. Notes carry front matter — `title`, `topic_ids` (the join key across KB/skill-map/quiz/planner), `licence` — and are written in our own words; external docs must be permissively licensed with URL + licence recorded and verified before ingest. Structure is chunk-friendly (heading hierarchy, code blocks whole).
+- **Decision:** `content/notes/*.md` (own-words, `licence: original`) + `content/sources.yaml` (external docs with a `verified` flag the pipeline enforces). Claude drafts outlines; Jalaj writes the prose (≥10 in his own words).
+- **Alternatives:** scraping arbitrary web text (licence/copyright risk, noisy); one giant document (poor retrieval granularity).
+- **Tradeoff:** curating and writing content is slow, but it's the quality ceiling for every downstream answer, quiz, and model answer.
+- **Interview angle:** "Where does your KB come from and how do you handle licensing?" → own notes + permissively-licensed/arXiv sources, URL+licence recorded, verified before ingest, short quotes + citations only.

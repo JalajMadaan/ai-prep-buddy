@@ -1,0 +1,57 @@
+# External documents for the knowledge base.
+#
+# Each entry needs a URL and a licence. Set `verified: true` only after you have
+# checked the licence on the source itself — the ingestion pipeline (M1-T2) skips
+# entries with `verified: false` so we never ingest material we haven't cleared.
+#
+# Licences we accept: MIT, Apache-2.0, CC-BY-4.0, and arXiv papers (record the
+# paper's stated licence). When unsure, leave verified: false and check later.
+
+sources:
+  - id: doc_lora_paper
+    title: "LoRA: Low-Rank Adaptation of Large Language Models"
+    url: https://arxiv.org/abs/2106.09685
+    source_type: paper
+    licence: "CC-BY-4.0"        # verify on the arXiv page before ingest
+    verified: false
+    topic_ids: [ft.lora_qlora]
+
+  - id: doc_qlora_paper
+    title: "QLoRA: Efficient Finetuning of Quantized LLMs"
+    url: https://arxiv.org/abs/2305.14314
+    source_type: paper
+    licence: "CC-BY-4.0"        # verify
+    verified: false
+    topic_ids: [ft.lora_qlora, serve.quantization]
+
+  - id: doc_attention_paper
+    title: "Attention Is All You Need"
+    url: https://arxiv.org/abs/1706.03762
+    source_type: paper
+    licence: "arXiv.org non-exclusive license"   # verify
+    verified: false
+    topic_ids: [llm.attention, llm.transformer_arch]
+
+  - id: doc_dpo_paper
+    title: "Direct Preference Optimization"
+    url: https://arxiv.org/abs/2305.18290
+    source_type: paper
+    licence: "CC-BY-4.0"        # verify
+    verified: false
+    topic_ids: [align.dpo]
+
+  - id: doc_llamaindex_docs
+    title: "LlamaIndex documentation"
+    url: https://docs.llamaindex.ai/
+    source_type: doc
+    licence: "MIT"              # project is MIT; verify docs terms
+    verified: false
+    topic_ids: [rag.chunking, rag.query_rewriting, ret.dense]
+
+  - id: doc_qdrant_docs
+    title: "Qdrant documentation"
+    url: https://qdrant.tech/documentation/
+    source_type: doc
+    licence: "Apache-2.0"       # project is Apache-2.0; verify docs terms
+    verified: false
+    topic_ids: [ret.ann_hnsw_ivf_pq, ret.hybrid_fusion]
