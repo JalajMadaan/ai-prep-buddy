@@ -48,8 +48,8 @@ revision:         ## Autogenerate a migration: make revision m="add x table"
 test-int:         ## Integration tests (requires `make up`)
 	$(UVDIR) pytest -m integration
 
-dev:
-	@echo "make dev: uvicorn app lands in M0-T5"
+dev:              ## Run the API with reload on :8000 (docs at /docs)
+	$(UVDIR) uvicorn app.main:app --reload --port 8000
 
 worker:
 	@echo "make worker: arq worker lands in a later milestone"
