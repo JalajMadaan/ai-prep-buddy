@@ -8,6 +8,7 @@ dependencies = [
     "asyncpg>=0.32.0",
     "fastapi>=0.162.7",
     "httpx>=0.28.1",
+    "litellm>=1.109.1",
     "prometheus-fastapi-instrumentator>=8.1.0",
     "pydantic-settings>=2.16.3",
     "redis>=8.1.0",
@@ -55,7 +56,7 @@ files = ["app"]
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = ["uuid6", "prometheus_fastapi_instrumentator"]
+module = ["uuid6", "prometheus_fastapi_instrumentator", "litellm"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

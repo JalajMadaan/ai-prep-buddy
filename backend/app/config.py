@@ -53,6 +53,25 @@ class Settings(BaseSettings):
     blob_backend: Literal["local", "azure"] = "local"
     blob_local_dir: str = "./.data/blobs"
 
+    # ---------- LLM providers and aliases ----------
+    gemini_api_key: str = ""
+    groq_api_key: str = ""
+    # LiteLLM model strings; empty until keys/models are configured. Fallbacks
+    # are comma-separated and split in the gateway.
+    llm_fast_model: str = ""
+    llm_fast_fallbacks: str = ""
+    llm_strong_model: str = ""
+    llm_strong_fallbacks: str = ""
+    llm_judge_model: str = ""
+    llm_followup_model: str = ""
+    llm_generator_model: str = ""
+    llm_timeout_fast_s: float = 4.0
+    llm_timeout_strong_s: float = 20.0
+    llm_timeout_judge_s: float = 30.0
+    llm_max_retries: int = 2
+    llm_retry_base_s: float = 0.5
+    llm_retry_max_delay_s: float = 8.0
+
     # ---------- Observability ----------
     langfuse_public_key: str = ""
     langfuse_secret_key: str = ""
