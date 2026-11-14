@@ -10,6 +10,7 @@ dependencies = [
     "httpx>=0.28.1",
     "jinja2>=3.1.6",
     "litellm>=1.109.1",
+    "llama-index-core>=0.14.26",
     "prometheus-fastapi-instrumentator>=8.1.0",
     "pydantic-settings>=2.16.3",
     "pyyaml>=6.0.3",
@@ -58,7 +59,7 @@ files = ["app"]
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = ["uuid6", "prometheus_fastapi_instrumentator", "litellm", "yaml"]
+module = ["uuid6", "prometheus_fastapi_instrumentator", "litellm", "yaml", "llama_index.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

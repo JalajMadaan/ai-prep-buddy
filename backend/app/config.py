@@ -72,6 +72,11 @@ class Settings(BaseSettings):
     llm_retry_base_s: float = 0.5
     llm_retry_max_delay_s: float = 8.0
 
+    # ---------- RAG / knowledge base ----------
+    kb_version: int = 1
+    rag_chunk_size: int = 512
+    rag_chunk_overlap: int = 64
+
     # ---------- Observability ----------
     langfuse_public_key: str = ""
     langfuse_secret_key: str = ""

@@ -57,8 +57,8 @@ dev:              ## Run the API with reload on :8000 (docs at /docs)
 worker:
 	@echo "make worker: arq worker lands in a later milestone"
 
-ingest:
-	@echo "make ingest: knowledge-base ingestion lands in M1"
+ingest:           ## Build the knowledge base from content/ (needs `make up`)
+	$(UVDIR) python -m app.rag.ingest
 
 eval-fast:
 	@echo "make eval-fast: evals land in M1/M4"
