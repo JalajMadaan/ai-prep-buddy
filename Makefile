@@ -6,7 +6,7 @@ UVDIR  := uv run --directory backend
 UVPROJ := uv run --project backend
 
 .PHONY: setup fmt lint type test check \
-        up down ps migrate revision dev worker test-int ingest eval-fast eval-full
+        up down ps migrate revision prompts-sync dev worker test-int ingest eval-fast eval-full
 
 # ---------- Working now (M0-T1) ----------
 setup:            ## Install deps and git hooks
@@ -44,6 +44,9 @@ migrate:          ## Apply database migrations (alembic upgrade head)
 
 revision:         ## Autogenerate a migration: make revision m="add x table"
 	$(UVDIR) alembic revision --autogenerate -m "$(m)"
+
+prompts-sync:     ## Validate all prompts (and push to Langfuse once configured)
+	$(UVDIR) python -m app.prompts.sync
 
 test-int:         ## Integration tests (requires `make up`)
 	$(UVDIR) pytest -m integration
