@@ -76,6 +76,11 @@ class Settings(BaseSettings):
     kb_version: int = 1
     rag_chunk_size: int = 512
     rag_chunk_overlap: int = 64
+    embed_model: str = "BAAI/bge-small-en-v1.5"
+    sparse_model: str = "Qdrant/bm25"
+    embed_dim: int = 384
+    qdrant_collection: str = "kb_chunks"
+    retrieve_top_k: int = 30
 
     # ---------- Observability ----------
     langfuse_public_key: str = ""

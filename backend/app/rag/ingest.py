@@ -14,6 +14,7 @@ from pathlib import Path
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.adapters.vector_store import ChunkRecord, QdrantVectorStore, VectorStore
 from app.config import get_settings
 from app.core.logging import get_logger, setup_logging
 from app.db.repositories.content import ContentRepository
@@ -36,12 +37,23 @@ def _content_hash(raw: str) -> str:
 
 
 async def ingest_notes(
-    session: AsyncSession, notes_dir: Path = NOTES_DIR, *, kb_version: int | None = None
+    session: AsyncSession,
+    notes_dir: Path = NOTES_DIR,
+    *,
+    kb_version: int | None = None,
+    vector_store: VectorStore | None = None,
 ) -> IngestReport:
-    """Ingest every note under ``notes_dir`` with content-hash skip + atomic replace."""
+    """Ingest every note under ``notes_dir`` with content-hash skip + atomic replace.
+
+    When a ``vector_store`` is given, each changed document's vectors are replaced
+    too (delete old, upsert new), keeping Qdrant in sync with Postgres.
+    """
     version = get_settings().kb_version if kb_version is None else kb_version
     repo = ContentRepository(session)
     report = IngestReport()
+
+    if vector_store is not None:
+        await vector_store.ensure_collection()
 
     for note in load_notes(notes_dir):
         digest = _content_hash(note.raw)
@@ -63,6 +75,23 @@ async def ingest_notes(
         rows = await repo.replace_chunks(
             doc.id, produced, topic_ids=note.topic_ids, kb_version=version
         )
+        if vector_store is not None:
+            await vector_store.delete_document(doc.id)
+            await vector_store.upsert_chunks(
+                [
+                    ChunkRecord(
+                        id=row.id,
+                        document_id=doc.id,
+                        text=row.text,
+                        title=doc.title,
+                        url=doc.source_url,
+                        section_path=row.section_path,
+                        topic_ids=list(row.topic_ids),
+                        kb_version=version,
+                    )
+                    for row in rows
+                ]
+            )
         await session.commit()
         report.ingested += 1
         report.chunks += len(rows)
@@ -79,8 +108,9 @@ async def ingest_notes(
 
 async def main() -> None:
     setup_logging()
+    store = QdrantVectorStore()
     async with get_sessionmaker()() as session:
-        await ingest_notes(session)
+        await ingest_notes(session, vector_store=store)
 
 
 if __name__ == "__main__":
