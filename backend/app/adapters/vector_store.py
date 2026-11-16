@@ -36,12 +36,24 @@ class SearchHit:
     payload: dict[str, Any]
 
 
+def _topic_filter(topic_ids: list[str] | None) -> models.Filter | None:
+    if not topic_ids:
+        return None
+    return models.Filter(
+        must=[models.FieldCondition(key="topic_ids", match=models.MatchAny(any=topic_ids))]
+    )
+
+
 class VectorStore(Protocol):
     async def ensure_collection(self) -> None: ...
     async def upsert_chunks(self, records: Sequence[ChunkRecord]) -> None: ...
     async def delete_document(self, document_id: uuid.UUID) -> None: ...
-    async def search_dense(self, query: str, *, limit: int) -> list[SearchHit]: ...
-    async def search_sparse(self, query: str, *, limit: int) -> list[SearchHit]: ...
+    async def search_dense(
+        self, query: str, *, limit: int, topic_ids: list[str] | None = None
+    ) -> list[SearchHit]: ...
+    async def search_sparse(
+        self, query: str, *, limit: int, topic_ids: list[str] | None = None
+    ) -> list[SearchHit]: ...
 
 
 class QdrantVectorStore:
@@ -125,19 +137,49 @@ class QdrantVectorStore:
             wait=True,
         )
 
-    async def search_dense(self, query: str, *, limit: int) -> list[SearchHit]:
+    async def search_dense(
+        self, query: str, *, limit: int, topic_ids: list[str] | None = None
+    ) -> list[SearchHit]:
         result = await self._client.query_points(
-            self._collection, query=embed_query_dense(query), using="dense", limit=limit
+            self._collection,
+            query=embed_query_dense(query),
+            using="dense",
+            limit=limit,
+            query_filter=_topic_filter(topic_ids),
         )
         return [self._to_hit(p) for p in result.points]
 
-    async def search_sparse(self, query: str, *, limit: int) -> list[SearchHit]:
+    async def search_sparse(
+        self, query: str, *, limit: int, topic_ids: list[str] | None = None
+    ) -> list[SearchHit]:
         sv = embed_query_sparse(query)
         result = await self._client.query_points(
             self._collection,
             query=models.SparseVector(indices=sv.indices, values=sv.values),
             using="sparse",
             limit=limit,
+            query_filter=_topic_filter(topic_ids),
+        )
+        return [self._to_hit(p) for p in result.points]
+
+    async def search_hybrid_native(
+        self, query: str, *, limit: int, topic_ids: list[str] | None = None
+    ) -> list[SearchHit]:
+        """Qdrant's built-in RRF fusion (for comparison with our own in M1-T4)."""
+        sv = embed_query_sparse(query)
+        result = await self._client.query_points(
+            self._collection,
+            prefetch=[
+                models.Prefetch(query=embed_query_dense(query), using="dense", limit=limit),
+                models.Prefetch(
+                    query=models.SparseVector(indices=sv.indices, values=sv.values),
+                    using="sparse",
+                    limit=limit,
+                ),
+            ],
+            query=models.FusionQuery(fusion=models.Fusion.RRF),
+            limit=limit,
+            query_filter=_topic_filter(topic_ids),
         )
         return [self._to_hit(p) for p in result.points]
 
