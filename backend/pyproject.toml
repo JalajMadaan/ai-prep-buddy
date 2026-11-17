@@ -68,6 +68,7 @@ module = [
     "yaml",
     "llama_index.*",
     "fastembed",
+    "fastembed.*",
 ]
 ignore_missing_imports = true
 

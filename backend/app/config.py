@@ -81,6 +81,9 @@ class Settings(BaseSettings):
     embed_dim: int = 384
     qdrant_collection: str = "kb_chunks"
     retrieve_top_k: int = 30
+    rerank_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
+    rerank_top_n: int = 6
+    rerank_enabled: bool = True
 
     # ---------- Observability ----------
     langfuse_public_key: str = ""
