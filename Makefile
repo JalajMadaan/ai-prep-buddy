@@ -6,7 +6,7 @@ UVDIR  := uv run --directory backend
 UVPROJ := uv run --project backend
 
 .PHONY: setup fmt lint type test check \
-        up down ps migrate revision prompts-sync dev worker test-int ingest eval-fast eval-full
+        up down ps migrate revision prompts-sync dev worker test-int ingest eval-retrieval eval-fast eval-full
 
 # ---------- Working now (M0-T1) ----------
 setup:            ## Install deps and git hooks
@@ -59,6 +59,9 @@ worker:
 
 ingest:           ## Build the knowledge base from content/ (needs `make up`)
 	$(UVDIR) python -m app.rag.ingest
+
+eval-retrieval:   ## Retrieval eval (recall@k, MRR) -> evals/reports/
+	$(UVPROJ) python evals/retrieval_eval.py
 
 eval-fast:
 	@echo "make eval-fast: evals land in M1/M4"

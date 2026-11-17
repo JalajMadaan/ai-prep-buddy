@@ -16,6 +16,7 @@ def _record(text: str, topic: str) -> ChunkRecord:
     return ChunkRecord(
         id=uuid.uuid4(),
         document_id=uuid.uuid4(),
+        source_key=f"notes/{topic}.md",
         text=text,
         title=topic,
         url=None,

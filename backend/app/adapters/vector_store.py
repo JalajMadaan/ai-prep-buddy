@@ -21,6 +21,7 @@ from app.rag.embeddings import embed_dense, embed_query_dense, embed_query_spars
 class ChunkRecord:
     id: uuid.UUID
     document_id: uuid.UUID
+    source_key: str
     text: str
     title: str
     url: str | None
@@ -110,6 +111,7 @@ class QdrantVectorStore:
                 payload={
                     "chunk_id": str(r.id),
                     "document_id": str(r.document_id),
+                    "source_key": r.source_key,
                     "title": r.title,
                     "url": r.url,
                     "section_path": r.section_path,

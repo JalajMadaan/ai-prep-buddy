@@ -82,6 +82,7 @@ async def ingest_notes(
                     ChunkRecord(
                         id=row.id,
                         document_id=doc.id,
+                        source_key=doc.source_key,
                         text=row.text,
                         title=doc.title,
                         url=doc.source_url,

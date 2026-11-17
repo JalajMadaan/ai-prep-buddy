@@ -14,6 +14,7 @@ from app.rag.fusion import reciprocal_rank_fusion
 class RetrievedChunk:
     chunk_id: uuid.UUID
     score: float
+    source_key: str
     text: str
     title: str
     url: str | None
@@ -46,6 +47,7 @@ class HybridRetriever:
                 RetrievedChunk(
                     chunk_id=chunk_id,
                     score=score,
+                    source_key=str(payload.get("source_key", "")),
                     text=str(payload.get("text", "")),
                     title=str(payload.get("title", "")),
                     url=str(payload["url"]) if payload.get("url") else None,

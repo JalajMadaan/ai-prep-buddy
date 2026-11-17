@@ -16,6 +16,7 @@ def _chunk(text: str) -> RetrievedChunk:
     return RetrievedChunk(
         chunk_id=uuid.uuid4(),
         score=0.0,
+        source_key="notes/x.md",
         text=text,
         title="",
         url=None,

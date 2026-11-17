@@ -27,6 +27,7 @@ async def test_hybrid_find_by_paraphrase_and_exact_term() -> None:
     qlora = ChunkRecord(
         id=uuid.uuid4(),
         document_id=document_id,
+        source_key="notes/lora_qlora.md",
         text="QLoRA fine-tunes a 4-bit quantized model with low-rank adapters on a single GPU.",
         title="LoRA and QLoRA",
         url=None,
@@ -37,6 +38,7 @@ async def test_hybrid_find_by_paraphrase_and_exact_term() -> None:
     hybrid = ChunkRecord(
         id=uuid.uuid4(),
         document_id=document_id,
+        source_key="notes/hybrid_retrieval_rrf.md",
         text="Hybrid retrieval fuses dense embeddings with BM25 sparse scores using RRF.",
         title="Hybrid retrieval",
         url=None,
