@@ -42,6 +42,15 @@ class UserRepository:
         """Fetch a user by primary key, or None."""
         return await self._session.get(User, user_id)
 
+    async def ensure(self, user_id: UUID, *, display_name: str) -> User:
+        """Return the user with this id, creating it if missing (used for dev auth)."""
+        user = await self.get(user_id)
+        if user is None:
+            user = User(id=user_id, display_name=display_name)
+            self._session.add(user)
+            await self._session.flush()
+        return user
+
     async def get_by_github_id(self, github_id: str) -> User | None:
         """Fetch a user by their GitHub id, or None."""
         result = await self._session.execute(select(User).where(User.github_id == github_id))
