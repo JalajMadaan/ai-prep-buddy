@@ -13,6 +13,62 @@ export type AskBody = {
   topic_filter?: string[] | null;
 };
 
+async function jsonFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...init,
+  });
+  if (!res.ok) throw new Error(`${path} failed (${res.status})`);
+  return (await res.json()) as T;
+}
+
+export type QuizQuestion = {
+  id: string;
+  kind: string;
+  text: string;
+  options: string[];
+  topic_ids: string[];
+};
+export type QuizToday = { quiz_session_id: string; questions: QuizQuestion[] };
+export type AnswerResult = {
+  correct: boolean;
+  score: number;
+  explanation: string;
+  next_due_at: string;
+};
+export type SkillTopic = {
+  topic_id: string;
+  mastery: number;
+  confidence: number;
+  attempts: number;
+};
+
+export function getQuizToday(): Promise<QuizToday> {
+  return jsonFetch<QuizToday>("/v1/quiz/today");
+}
+
+export function submitAnswer(body: {
+  quiz_session_id: string;
+  question_id: string;
+  answer?: string;
+  self_rating?: string | null;
+}): Promise<AnswerResult> {
+  return jsonFetch<AnswerResult>("/v1/quiz/answer", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export function finishQuiz(
+  sessionId: string,
+): Promise<{ summary: { total: number; correct: number } }> {
+  return jsonFetch(`/v1/quiz/sessions/${sessionId}/finish`, { method: "POST" });
+}
+
+export function getSkills(): Promise<{ topics: SkillTopic[] }> {
+  return jsonFetch<{ topics: SkillTopic[] }>("/v1/skills");
+}
+
 export async function createConversation(): Promise<string> {
   const res = await fetch(`${API_BASE}/v1/study/conversations`, {
     method: "POST",

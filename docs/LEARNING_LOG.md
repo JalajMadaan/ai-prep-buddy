@@ -239,3 +239,10 @@ One entry per ticket. Keep each entry short enough to reread before an interview
 - **Alternatives:** make users hand-author cards (friction, they won't); auto-approve generated cards (same trust issue as generated MCQs — so they're draft).
 - **Numbers:** up to 5 cards per answer; integration test: an answer citing a LoRA chunk yields 2 draft flashcards tagged `ft.lora_qlora`.
 - **Interview angle:** how the modules share one taxonomy — study citations carry chunk topic_ids, so cards made from an answer are automatically filed under the right topics and flow into the same spaced-repetition + skill-map machinery as every other question.
+
+### M2-T8 · Frontend quiz + skill-map · 2026-11-18
+- **Concept:** The clickable quiz: fetch the daily drill, answer each question by kind (MCQ options / short textarea / flashcard self-rating), show grading feedback + the next review date, then a finish summary. A skill-map page visualises mastery per topic as bars.
+- **Decision:** a `GET /v1/skills` endpoint (mastery/confidence/attempts per topic) + Next.js pages (`/quiz`, `/skills`) and a small nav; the drill endpoint never returns answers, so the UI only reveals correctness after submitting.
+- **Tradeoff:** flashcards can't show the "back" from the drill (answers aren't sent to the client) — a v1 limitation; the self-rating still drives scheduling.
+- **Numbers:** `npm run build` passes; 3 pages (study/quiz/skills) + skills endpoint.
+- **Interview angle:** the skill-map view reads the same `skill_states` that quizzes and (later) interviews write, so one screen reflects evidence from every module — the shared-core design paying off.
