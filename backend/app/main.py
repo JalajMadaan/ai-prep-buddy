@@ -13,6 +13,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.admin import router as admin_router
 from app.api.health import router as health_router
+from app.api.quiz import router as quiz_router
 from app.api.study import router as study_router
 from app.config import get_settings
 from app.core.errors import register_exception_handlers
@@ -39,6 +40,7 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(study_router)
     app.include_router(admin_router)
+    app.include_router(quiz_router)
 
     # /metrics + per-route latency histograms (hidden from the OpenAPI schema).
     Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
