@@ -1,0 +1,140 @@
+# Seed question bank. [YOU-WRITE]: expand to 60 (30 in your own words), across the
+# taxonomy and all kinds. Idempotent import: set an explicit `key` or let it derive
+# from the text. MCQ answer = {correct_index}; short = {reference} + a rubric;
+# flashcard = {back}.
+
+rubrics:
+  - name: short_answer_default
+    version: 1
+    dimensions:
+      - { key: correctness, description: "Factually correct and on-topic", weight: 0.6 }
+      - { key: completeness, description: "Covers the key points", weight: 0.25 }
+      - { key: clarity, description: "Clear and well structured", weight: 0.15 }
+    anchors: {}
+
+questions:
+  - key: q-attn-sqrt-dk
+    kind: mcq
+    topic_ids: [llm.attention]
+    difficulty: 2
+    text: "In scaled dot-product attention, why divide the scores by the square root of d_k?"
+    options:
+      - "To add regularisation like dropout"
+      - "To keep dot products from growing with dimension and saturating softmax"
+      - "To normalise the token embeddings to unit length"
+      - "To mask out future tokens during decoding"
+    answer: { correct_index: 1 }
+    explanation: "As d_k grows, QKᵀ magnitudes grow, pushing softmax into saturation and shrinking gradients; dividing by sqrt(d_k) keeps them stable."
+
+  - key: q-decoding-temperature
+    kind: mcq
+    topic_ids: [llm.decoding]
+    difficulty: 2
+    text: "What does lowering the temperature toward 0 do to sampling?"
+    options:
+      - "Makes the distribution flatter and more random"
+      - "Has no effect without top-k"
+      - "Makes the distribution sharper, approaching greedy decoding"
+      - "Increases the context window"
+    answer: { correct_index: 2 }
+    explanation: "Temperature scales the logits; as T→0 the distribution sharpens toward the argmax (greedy)."
+
+  - key: q-topk-vs-topp
+    kind: short
+    topic_ids: [llm.decoding]
+    difficulty: 3
+    rubric: short_answer_default
+    text: "Explain the difference between top-k and top-p (nucleus) sampling."
+    answer:
+      reference: "Top-k samples from the k highest-probability tokens; top-p samples from the smallest set of tokens whose cumulative probability exceeds p, so the candidate set size adapts to the distribution."
+    explanation: "Top-p is adaptive; top-k is a fixed cutoff."
+
+  - key: q-bi-vs-cross
+    kind: short
+    topic_ids: [nlp.cross_vs_bi_encoders, ret.reranking]
+    difficulty: 3
+    rubric: short_answer_default
+    text: "Why use a bi-encoder for retrieval but a cross-encoder for reranking?"
+    answer:
+      reference: "Bi-encoders embed query and document separately so document vectors are precomputed and searched fast over the whole corpus; cross-encoders score the pair jointly for higher accuracy but cannot be precomputed, so they are only run on the top-N candidates."
+    explanation: "Retrieve cheap and high-recall, then rerank the top-N precisely."
+
+  - key: q-rrf-vs-avg
+    kind: short
+    topic_ids: [ret.hybrid_fusion]
+    difficulty: 3
+    rubric: short_answer_default
+    text: "Why fuse dense and sparse results with reciprocal rank fusion instead of averaging their scores?"
+    answer:
+      reference: "Cosine and BM25 scores are on different, uncalibrated scales, so averaging lets one dominate; RRF uses only each document's rank (sum of 1/(k+rank)), making fusion scale-free."
+    explanation: "RRF discards magnitudes and combines by rank."
+
+  - key: q-bm25-exact-terms
+    kind: mcq
+    topic_ids: [ret.bm25_sparse]
+    difficulty: 2
+    text: "What is BM25 especially good at compared to dense embeddings?"
+    options:
+      - "Capturing paraphrases and synonyms"
+      - "Matching exact/rare technical terms"
+      - "Understanding images"
+      - "Reducing index size to zero"
+    answer: { correct_index: 1 }
+    explanation: "BM25 scores exact lexical overlap with IDF weighting, nailing rare terms like QLoRA or HNSW that dense vectors can blur."
+
+  - key: q-chunking-tradeoff
+    kind: short
+    topic_ids: [rag.chunking]
+    difficulty: 3
+    rubric: short_answer_default
+    text: "What goes wrong if RAG chunks are too large, and what if they are too small?"
+    answer:
+      reference: "Too large dilutes the embedding (one vector for many ideas), hurting precision and wasting context; too small loses surrounding context so an answer is scattered across many chunks. Overlap helps avoid cutting an idea at a boundary."
+    explanation: "Chunk size trades precision against context."
+
+  - key: q-faithfulness
+    kind: flashcard
+    topic_ids: [rag.citations_grounding, rag.eval]
+    difficulty: 2
+    text: "What does RAG 'faithfulness' measure?"
+    answer:
+      back: "The share of claims in the answer that are actually entailed by the retrieved context — the direct signal for hallucination."
+
+  - key: q-abstain
+    kind: flashcard
+    topic_ids: [rag.citations_grounding]
+    difficulty: 2
+    text: "When should a RAG assistant abstain instead of answering?"
+    answer:
+      back: "When the top reranked score is below a tuned threshold — say 'not covered', suggest nearest topics, and log a content gap rather than inventing an answer."
+
+  - key: q-lora
+    kind: short
+    topic_ids: [ft.lora_qlora]
+    difficulty: 3
+    rubric: short_answer_default
+    text: "Explain how LoRA fine-tunes a model with far fewer trainable parameters."
+    answer:
+      reference: "LoRA freezes the base weights and injects small low-rank matrices A and B so the weight update is B·A with rank r much smaller than the dimension; only A and B are trained, which is a tiny fraction of parameters and yields small, swappable adapters."
+    explanation: "Low-rank update instead of updating all weights."
+
+  - key: q-qlora-4bit
+    kind: flashcard
+    topic_ids: [ft.lora_qlora, serve.quantization]
+    difficulty: 3
+    text: "Why does QLoRA let you fine-tune a 7B model on a single 16 GB GPU?"
+    answer:
+      back: "It quantizes the frozen base model to 4-bit (NF4) to slash memory, keeps small LoRA adapters in higher precision, and uses paged optimizers — so the whole thing fits in ~16 GB."
+
+  - key: q-weighted-kappa
+    kind: mcq
+    topic_ids: [eval.llm_judge, eval.stats]
+    difficulty: 3
+    text: "Why use quadratic-weighted Cohen's kappa to compare an LLM judge with human graders on 1-5 scores?"
+    options:
+      - "Because the scores are categorical with no order"
+      - "Because it ignores chance agreement"
+      - "Because it credits near-misses more than distant disagreements on ordinal scores"
+      - "Because it only works for binary labels"
+    answer: { correct_index: 2 }
+    explanation: "1-5 scores are ordinal; quadratic weights penalise a 1-vs-5 disagreement far more than 3-vs-4, unlike plain accuracy."

@@ -7,7 +7,8 @@ UVPROJ := uv run --project backend
 UVEVAL := uv run --project backend --group evals
 
 .PHONY: setup fmt lint type test check \
-        up down ps migrate revision prompts-sync dev worker test-int ingest eval-retrieval eval-fast eval-full
+        up down ps migrate revision prompts-sync dev worker test-int ingest import-questions \
+        eval-retrieval eval-fast eval-full
 
 # ---------- Working now (M0-T1) ----------
 setup:            ## Install deps and git hooks
@@ -63,6 +64,9 @@ ingest:           ## Build the knowledge base from content/ (needs `make up`)
 
 eval-retrieval:   ## Retrieval eval (recall@k, MRR) -> evals/reports/
 	$(UVPROJ) python evals/retrieval_eval.py
+
+import-questions: ## Import the seed question bank (needs `make up`)
+	$(UVDIR) python -m app.quiz.importer
 
 eval-fast:        ## PR-sized eval subset (Ragas on a few golden items)
 	$(UVEVAL) python evals/ragas_run.py --limit 5
