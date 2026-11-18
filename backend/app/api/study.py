@@ -12,10 +12,13 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.adapters.question_index import QdrantQuestionIndex
 from app.api.deps import Principal, get_current_user
 from app.db.repositories.conversations import ConversationRepository
 from app.db.repositories.users import UserRepository
 from app.db.session import get_session
+from app.llm.gateway import Gateway
+from app.quiz.cards import CardMaker
 from app.services.study import build_study_service
 
 router = APIRouter(prefix="/v1/study", tags=["study"])
@@ -65,3 +68,15 @@ async def ask(
             yield _sse(event, data)
 
     return StreamingResponse(stream(), media_type="text/event-stream")
+
+
+@router.post("/messages/{message_id}/to-cards")
+async def to_cards(
+    message_id: UUID,
+    _user: Annotated[Principal, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> dict[str, list[str]]:
+    maker = CardMaker(session, Gateway(), QdrantQuestionIndex())
+    question_ids = await maker.from_message(message_id)
+    await session.commit()
+    return {"question_ids": [str(qid) for qid in question_ids]}

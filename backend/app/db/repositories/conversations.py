@@ -24,6 +24,9 @@ class ConversationRepository:
     async def get(self, conversation_id: uuid.UUID) -> Conversation | None:
         return await self._session.get(Conversation, conversation_id)
 
+    async def get_message(self, message_id: uuid.UUID) -> Message | None:
+        return await self._session.get(Message, message_id)
+
     async def recent_messages(self, conversation_id: uuid.UUID, *, limit: int = 6) -> list[Message]:
         """Return the last ``limit`` messages in chronological order."""
         stmt = (
