@@ -32,6 +32,10 @@ dev = [
     "pre-commit>=4.0",
     "httpx>=0.28.1",
 ]
+evals = [
+    "langchain-openai>=1.8.1",
+    "ragas>=0.4.4",
+]
 
 # No [build-system]: this is a virtual (application) project. uv manages the
 # environment and dependencies but does not build/install `app` as a package;

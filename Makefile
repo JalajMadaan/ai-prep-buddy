@@ -4,6 +4,7 @@
 #   UVPROJ : run WITH cwd = repo root  (pre-commit needs .git + config at root)
 UVDIR  := uv run --directory backend
 UVPROJ := uv run --project backend
+UVEVAL := uv run --project backend --group evals
 
 .PHONY: setup fmt lint type test check \
         up down ps migrate revision prompts-sync dev worker test-int ingest eval-retrieval eval-fast eval-full
@@ -63,8 +64,8 @@ ingest:           ## Build the knowledge base from content/ (needs `make up`)
 eval-retrieval:   ## Retrieval eval (recall@k, MRR) -> evals/reports/
 	$(UVPROJ) python evals/retrieval_eval.py
 
-eval-fast:
-	@echo "make eval-fast: evals land in M1/M4"
+eval-fast:        ## PR-sized eval subset (Ragas on a few golden items)
+	$(UVEVAL) python evals/ragas_run.py --limit 5
 
-eval-full:
-	@echo "make eval-full: evals land in M1/M4"
+eval-full:        ## Full eval suite (all answerable golden items)
+	$(UVEVAL) python evals/ragas_run.py --limit 0
