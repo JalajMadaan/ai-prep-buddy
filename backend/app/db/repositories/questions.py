@@ -65,3 +65,10 @@ class QuestionRepository:
 
     async def get(self, question_id: uuid.UUID) -> Question | None:
         return await self._session.get(Question, question_id)
+
+    async def set_status(self, question_id: uuid.UUID, status: str) -> Question | None:
+        question = await self.get(question_id)
+        if question is not None:
+            question.status = status
+            await self._session.flush()
+        return question
