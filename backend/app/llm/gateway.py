@@ -9,6 +9,7 @@ LiteLLM, so no network or API keys are needed.
 
 from __future__ import annotations
 
+import os
 import time
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
@@ -66,6 +67,13 @@ def _split(csv: str) -> tuple[str, ...]:
 
 def _nonempty(models: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(m for m in models if m)
+
+
+def _export_provider_keys(s: Settings) -> None:
+    """Bridge provider keys from settings into os.environ so LiteLLM finds them."""
+    for name, value in (("GEMINI_API_KEY", s.gemini_api_key), ("GROQ_API_KEY", s.groq_api_key)):
+        if value and not os.environ.get(name):
+            os.environ[name] = value
 
 
 def _build_aliases(s: Settings) -> dict[str, AliasConfig]:
@@ -128,6 +136,7 @@ class Gateway:
         retry_max_delay_s: float | None = None,
     ) -> None:
         s = get_settings()
+        _export_provider_keys(s)
         self._aliases = aliases if aliases is not None else _build_aliases(s)
         self._max_retries = s.llm_max_retries if max_retries is None else max_retries
         self._retry_base_s = s.llm_retry_base_s if retry_base_s is None else retry_base_s

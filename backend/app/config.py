@@ -84,6 +84,8 @@ class Settings(BaseSettings):
     rerank_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
     rerank_top_n: int = 6
     rerank_enabled: bool = True
+    # Abstain when the top rerank score is below this (tuned on the golden set).
+    abstain_threshold: float = 0.0
 
     # ---------- Observability ----------
     langfuse_public_key: str = ""

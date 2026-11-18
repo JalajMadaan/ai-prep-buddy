@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.health import router as health_router
+from app.api.study import router as study_router
 from app.config import get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import setup_logging
@@ -35,6 +36,7 @@ def create_app() -> FastAPI:
     )
     register_exception_handlers(app)
     app.include_router(health_router)
+    app.include_router(study_router)
 
     # /metrics + per-route latency histograms (hidden from the OpenAPI schema).
     Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
